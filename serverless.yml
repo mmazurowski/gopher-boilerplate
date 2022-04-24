@@ -1,0 +1,26 @@
+frameworkVersion: "3"
+
+service: ${env:SERVICE_NAME, 'service'}
+
+useDotenv: true
+plugins:
+  - serverless-iam-roles-per-function
+
+provider:
+  name: aws
+  region: ${env:AWS_REGION, 'eu-west-1'}
+  runtime: go1.x
+  stage: ${opt:stage, 'dev'}
+  memorySize: 256
+  timeout: 29
+  environment:
+    SERVICE_NAME: ${self:service}
+
+package:
+  individually: true
+  exclude:
+    - "**/*"
+
+functions:
+  - ${file(src/modules/hello-say-hello/function.yml)}
+  - ${file(src/modules/hello-scream-world/function.yml)}

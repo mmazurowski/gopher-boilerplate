@@ -1,0 +1,9 @@
+hello:
+  handler: bin/hello-say-hello
+  package:
+    include:
+      - bin/hello-say-hello
+  events:
+    - httpApi:
+        path: /hello-world
+        method: post
