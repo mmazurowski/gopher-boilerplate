@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v3.2.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+  - repo: local
+    hooks:
+      - id: semgrep
+        name: Semgrep
+        description: Checks source with semgrep rules.
+        entry: ./hooks/semgrep.sh
+        language: script
+        types:
+          - go
+      - id: conventional-commit
+        name: Conventional commit validation
+        description: Validate git commit messages
+        entry: ./hooks/commit-message.sh
+        language: script
+        stages:
+          - commit-msg

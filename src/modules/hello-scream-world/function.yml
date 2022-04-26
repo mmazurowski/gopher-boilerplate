@@ -1,0 +1,9 @@
+world:
+  handler: bin/world
+  package:
+    include:
+      - bin/hello-scream-world
+  events:
+    - httpApi:
+        path: /world
+        method: get

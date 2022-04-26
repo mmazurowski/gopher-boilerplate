@@ -1,0 +1,25 @@
+version: "3"
+
+dotenv: ['.env']
+
+tasks:
+  project:build:
+    env:
+      STAGE: "dev"
+      GOARCH: "amd64"
+      GOOS: "linux"
+    cmds:
+      - for dir in ./src/modules/*; do dir=${dir%*/} go build -ldflags="-s -w" -o bin/"${dir##*/}" src/modules/"${dir##*/}"/main.go; done
+  project:clean: rm -fr bin
+  project:deploy:
+    cmds:
+      - task: project:build
+      - sls deploy --verbose --aws-profile $DEPLOYMENT_PROFILE
+      - task: project:clean
+  project:destroy:
+    cmds:
+      - sls remove --verbose --aws-profile $DEPLOYMENT_PROFILE
+      - task: project:clean
+  project:prepare:
+    cmds:
+      - npm install && (cd documentation && npm install)
