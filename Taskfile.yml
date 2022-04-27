@@ -12,6 +12,9 @@ tasks:
       - for dir in ./src/modules/*; do dir=${dir%*/} go build -ldflags="-s -w" -o bin/"${dir##*/}" src/modules/"${dir##*/}"/main.go; done
   project:clean: rm -fr bin
   project:deploy:
+    env:
+      GIT_TAG:
+        sh: git describe --always --tags
     cmds:
       - task: project:build
       - sls deploy --verbose --aws-profile $DEPLOYMENT_PROFILE
