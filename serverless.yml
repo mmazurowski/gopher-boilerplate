@@ -15,6 +15,7 @@ provider:
   timeout: 29
   environment:
     SERVICE_NAME: ${self:service}
+    ENTERPRISE_EVENT_BRIDGE: ${env:ENTERPRISE_EVENT_BRIDGE, 'default'}
 
 package:
   individually: true

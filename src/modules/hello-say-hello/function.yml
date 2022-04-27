@@ -7,3 +7,8 @@ hello:
     - httpApi:
         path: /hello-world
         method: post
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action:
+        - events:PutEvents
+      Resource: "arn:aws:events:eu-west-1:*:event-bus/default"
