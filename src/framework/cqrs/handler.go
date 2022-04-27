@@ -1,6 +1,8 @@
 package cqrs
 
+import "context"
+
 type Handler interface {
 	Name() string
-	Handle(cmd any) any
+	Handle(ctx context.Context, cmd any) any
 }

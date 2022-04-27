@@ -1,6 +1,7 @@
 package cqrs
 
 import (
+	"context"
 	"errors"
 )
 
@@ -14,12 +15,12 @@ func Factory(handlers []Handler) Bus {
 	}
 }
 
-func (c *Bus) Handle(cmd Command) (any, error) {
+func (c *Bus) Handle(ctx context.Context, cmd Command) (any, error) {
 	var res any
 
 	for _, v := range c.handlers {
 		if v.Name() == cmd.Name() {
-			res = v.Handle(cmd)
+			res = v.Handle(ctx, cmd)
 			break
 		}
 	}
