@@ -14,6 +14,7 @@ type Formatter struct {
 
 func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 	serviceFromEnv := os.Getenv("SERVICE_NAME")
+	serviceVersion := os.Getenv("SERVICE_VERSION")
 
 	serviceName := serviceFromEnv
 
@@ -26,6 +27,7 @@ func (f *Formatter) Format(entry *log.Entry) ([]byte, error) {
 		"message":     entry.Message,
 		"timestamp":   entry.Time.Format(time.RFC3339),
 		"application": serviceName,
+		"version":     serviceVersion,
 	}
 
 	serialized, err := json.Marshal(message)
