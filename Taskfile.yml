@@ -25,4 +25,19 @@ tasks:
       - task: project:clean
   project:prepare:
     cmds:
-      - npm install && (cd documentation && npm install)
+      - npm install && (cd documentation/app-docs && npm install)
+      - cd documentation/events-docs && npm install
+  docs:generateAll:
+    cmds:
+      - task: docs:app:generate
+      - task: docs:events:generate
+  docs:app:generate:
+    dir: documentation/app-docs
+    cmds:
+      - npm run build
+  docs:events:generate:
+    env:
+      PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
+    dir: documentation/events-docs
+    cmds:
+      - ag api.yml @asyncapi/html-template -o dist --force-write

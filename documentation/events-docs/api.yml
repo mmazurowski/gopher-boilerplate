@@ -1,0 +1,53 @@
+asyncapi: "2.2.0"
+info:
+  title: gopher-boilerplate
+  version: "1.0.0"
+  description: |
+    gopher is awesome
+    and the events published by it as well
+  license:
+    name: MIT
+    url: https://github.com/mmazurowski/gopher-boilerplate/LICENSE
+servers:
+  dev:
+    url: "https:events.eu-west-2.amazonaws.com"
+    protocol: https
+    description: Enterprise bus endpoint
+  acc:
+    url: "https:events.eu-west-2.amazonaws.com"
+    protocol: https
+    description: Enterprise bus endpoint
+  prod:
+    url: "https:events.eu-west-2.amazonaws.com"
+    protocol: https
+    description: Enterprise bus endpoint
+
+channels:
+  gopher-boilerplate:
+    description: description
+    publish:
+      message:
+        name: gopher-boilerplate
+        title: gopher-boilerplate
+        summary: Describes business event
+        payload:
+          type: object
+          additionalProperties: false
+          properties:
+            time:
+              type: string
+              format: dateTime
+              example: "2022-04-30T19:11:58+02:00"
+            source:
+              type: string
+              example: gopher-service
+            detail-type:
+              type: string
+              example: gopher-boilerplate
+            detail:
+              type: object
+              additionalProperties: false
+              properties:
+                Message:
+                  type: string
+                  example: Hello world!

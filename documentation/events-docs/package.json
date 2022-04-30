@@ -1,0 +1,11 @@
+{
+  "name": "events-docs",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [],
+  "author": "mmazurowski",
+  "license": "MIT",
+  "dependencies": {
+    "@asyncapi/generator": "^1.9.3"
+  }
+}
