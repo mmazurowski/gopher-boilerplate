@@ -4,14 +4,19 @@ dotenv: ['.env']
 
 tasks:
   project:build:
+    summary: Compiles all Lambda functions inside modules directory.
     env:
       STAGE: "dev"
       GOARCH: "amd64"
       GOOS: "linux"
     cmds:
       - for dir in ./src/modules/*; do dir=${dir%*/} go build -ldflags="-s -w" -o bin/"${dir##*/}" src/modules/"${dir##*/}"/main.go; done
-  project:clean: rm -fr bin
+  project:clean:
+    summary: Removes compiled binaries from previous build.
+    cmds:
+      - rm -fr bin
   project:deploy:
+    summary: Provide current commit tag and deploys service under specified AWS Profile.
     env:
       GIT_TAG:
         sh: git describe --always --tags
@@ -20,24 +25,34 @@ tasks:
       - sls deploy --verbose --aws-profile $DEPLOYMENT_PROFILE
       - task: project:clean
   project:destroy:
+    summary: Destroys Cloudformation stack and cleans binaries directory.
     cmds:
       - sls remove --verbose --aws-profile $DEPLOYMENT_PROFILE
       - task: project:clean
   project:prepare:
+    summary: Installs NPM packages required to generate docusaurus pages and Async API pages.
     cmds:
       - npm install && (cd documentation/app-docs && npm install)
       - cd documentation/events-docs && npm install
   docs:generateAll:
+    summary: Generates docusaurus documentation of application. Requires installed npm dependencies.
     cmds:
       - task: docs:app:generate
       - task: docs:events:generate
-  docs:app:generate:
+  docs:app:build:
+    summary: |
+      Builds docusaurus documentation of application. Requires installed npm dependencies.
     dir: documentation/app-docs
     cmds:
       - npm run build
-  docs:events:generate:
+  docs:events:build:
+    summary: Generates static assets for Async API documentation.
     env:
       PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: true
     dir: documentation/events-docs
     cmds:
       - ag api.yml @asyncapi/html-template -o dist --force-write
+  docs:populate:
+    summary: Populates markdown files into documentation directory based on Taskfile.
+    cmds:
+      - sh scripts/generate-readme.sh
