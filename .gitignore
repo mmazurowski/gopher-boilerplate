@@ -10,6 +10,10 @@
 # Serverless
 node_modules
 
+# build files
+dist
+build
+
 # golang output binary directory
 bin
 
