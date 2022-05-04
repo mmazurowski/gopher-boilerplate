@@ -56,3 +56,13 @@ tasks:
     summary: Populates markdown files into documentation directory based on Taskfile.
     cmds:
       - sh scripts/generate-readme.sh
+  tests:all:
+    summary: Executes all tests
+    dir: src/modules/
+    cmds:
+      - go test ./... -cover
+  tests:benchmark:
+    summary: Executes benchmark tests
+    dir: src/modules/
+    cmds:
+      - go test ./... -bench=.  -run=^#
