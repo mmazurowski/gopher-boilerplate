@@ -1,0 +1,67 @@
+name: development
+on: pull_request
+
+concurrency:
+  group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
+  cancel-in-progress: true
+
+jobs:
+  staticcheck:
+    name: Static Check
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: WillAbides/setup-go-faster@v1.7.0
+        with:
+          go-version: 1.18.x
+      - uses: dominikh/staticcheck-action@v1.2.0
+        with:
+            version: "2022.1"
+            build-tags: "-s -w"
+            install-go: false
+  build:
+    name: Build
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: WillAbides/setup-go-faster@v1.7.0
+        with:
+          go-version: 1.18.x
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Build
+        run: task project:build
+  unit:
+    name: Unit Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: WillAbides/setup-go-faster@v1.7.0
+        with:
+          go-version: 1.18.x
+      - name: Install Task
+        uses: arduino/setup-task@v1
+      - name: Runt tests
+        run: task tests:all
+  deploy:
+    needs:
+      - unit
+      - staticcheck
+      - build
+    name: Unit Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+      - uses: WillAbides/setup-go-faster@v1.7.0
+        with:
+          go-version: 1.18.x
+      - name: Deploy to AWS
+        run: echo "Deployed!"
