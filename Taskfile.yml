@@ -4,13 +4,13 @@ dotenv: ['.env']
 
 tasks:
   project:build:
-    summary: Compiles all Lambda functions inside modules directory.
+    summary: Compiles all Lambda functions inside functions directory.
     env:
       STAGE: "dev"
       GOARCH: "amd64"
       GOOS: "linux"
     cmds:
-      - for dir in ./src/modules/*; do dir=${dir%*/} go build -ldflags="-s -w" -o bin/"${dir##*/}" src/modules/"${dir##*/}"/main.go; done
+      - for dir in ./src/functions/*; do dir=${dir%*/} go build -ldflags="-s -w" -o bin/"${dir##*/}" src/functions/"${dir##*/}"/*.go; done
   project:clean:
     summary: Removes compiled binaries from previous build.
     cmds:

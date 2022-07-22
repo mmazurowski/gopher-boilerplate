@@ -1,0 +1,27 @@
+### Fails validation
+POST  {{host}}/v1/hello-world
+Content-Type: application/json
+
+{
+}
+
+> {%
+client.test("Fails validation", () => {
+  client.assert(response.status === 422, "Response status is not 422");
+});
+%}
+
+### Returns success
+
+POST  {{host}}/v1/hello-world
+Content-Type: application/json
+
+{
+  "name": "Walter White"
+}
+
+> {%
+client.test("Returns success", () => {
+  client.assert(response.status === 200, "Response status is not 200");
+});
+%}
