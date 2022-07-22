@@ -15,7 +15,8 @@ provider:
   timeout: 29
   environment:
     SERVICE_NAME: ${self:service}
-    SERVICE_VERSION: ${env:GIT_TAG}
+    SERVICE_ENV: ${opt:stage, 'dev'}
+    SERVICE_VERSION: ${env:GIT_TAG, 'NO_VERSION'}
     ENTERPRISE_EVENT_BRIDGE: ${env:ENTERPRISE_EVENT_BRIDGE, 'default'}
 
 package:
@@ -24,5 +25,26 @@ package:
     - "**/*"
 
 functions:
-  - ${file(src/modules/hello-say-hello/function.yml)}
-  - ${file(src/modules/hello-scream-world/function.yml)}
+  - ${file(src/functions/v1-hello-say-hello/function.yml)}
+
+
+resources:
+  - Resources:
+      ErrorHandling:
+        Type: 'AWS::ApiGateway::GatewayResponse'
+        Properties:
+          ResponseParameters:
+            gatewayresponse.header.Access-Control-Allow-Origin: "'*'"
+            gatewayresponse.header.Access-Control-Allow-Headers: "'*'"
+          ResponseTemplates:
+            application/json: |
+              {
+                "message": $context.error.messageString,
+                "type": "$context.error.responseType",
+                "status": 500,
+                "path": "$context.resourcePath",
+              }
+          StatusCode: "500"
+          ResponseType: DEFAULT_5XX
+          RestApiId:
+            Ref: ApiGatewayRestApi

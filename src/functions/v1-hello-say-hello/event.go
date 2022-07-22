@@ -1,23 +1,22 @@
-package adapters
+package main
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/go-playground/validator"
 )
 
-type Event struct {
+type GreetEvent struct {
 	Name string `json:"name" validate:"required"`
 }
 
-func FromAPIGatewayEvent(event events.APIGatewayProxyRequest) (*Event, error) {
-	var payload Event
+func parseGatewayEvent(event events.APIGatewayProxyRequest) (*GreetEvent, error) {
+	var payload GreetEvent
 	err := json.Unmarshal([]byte(event.Body), &payload)
 
 	if err != nil {
-		return nil, errors.New(" could not decode payload" + err.Error())
+		return nil, err
 	}
 
 	validate := validator.New()
@@ -25,8 +24,8 @@ func FromAPIGatewayEvent(event events.APIGatewayProxyRequest) (*Event, error) {
 	err = validate.Struct(payload)
 
 	if err != nil {
-		return nil, errors.New(" payload did not pass validation" + err.Error())
+		return nil, err
 	}
 
-	return &payload, err
+	return &payload, nil
 }

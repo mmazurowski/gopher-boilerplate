@@ -1,11 +1,11 @@
 hello:
-  handler: bin/hello-say-hello
+  handler: bin/v1-hello-say-hello
   package:
     include:
-      - bin/hello-say-hello
+      - bin/v1-hello-say-hello
   events:
-    - httpApi:
-        path: /hello-world
+    - http:
+        path: /v1/hello-world
         method: post
   iamRoleStatements:
     - Effect: "Allow"

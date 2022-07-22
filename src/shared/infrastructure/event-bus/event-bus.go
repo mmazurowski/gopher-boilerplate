@@ -7,7 +7,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchevents"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatchevents/types"
-	"github.com/mmazurowski/gopher-boilerplate/src/shared/aws"
+	"github.com/mmazurowski/gopher-boilerplate/src/shared/infrastructure/aws"
 )
 
 type EventBus struct {
