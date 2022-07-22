@@ -58,11 +58,11 @@ tasks:
       - sh scripts/generate-readme.sh
   tests:all:
     summary: Executes all tests
-    dir: src/modules/
+    dir: src/functions/
     cmds:
       - go test ./... -cover
   tests:benchmark:
     summary: Executes benchmark tests
-    dir: src/modules/
+    dir: src/functions/
     cmds:
       - go test ./... -bench=.  -run=^#
