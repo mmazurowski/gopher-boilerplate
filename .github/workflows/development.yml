@@ -54,7 +54,7 @@ jobs:
       - unit
       - staticcheck
       - build
-    name: Unit Tests
+    name: Deploy to AWS
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v1
