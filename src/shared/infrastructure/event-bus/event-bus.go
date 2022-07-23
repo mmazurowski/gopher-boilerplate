@@ -1,4 +1,4 @@
-package event_bus
+package eventbus
 
 import (
 	"context"
@@ -43,7 +43,13 @@ func (bus *EventBus) Publish(ctx context.Context, messages []EventMessage) error
 	for i := range messages {
 		message := messages[i]
 
-		entries[i] = types.PutEventsRequestEntry{DetailType: &message.detailType, EventBusName: &bus.busName, Source: &bus.applicationName, Time: &message.time, Detail: &message.message}
+		entries[i] = types.PutEventsRequestEntry{
+			DetailType:   &message.detailType,
+			EventBusName: &bus.busName,
+			Source:       &bus.applicationName,
+			Time:         &message.time,
+			Detail:       &message.message,
+		}
 	}
 
 	input := cloudwatchevents.PutEventsInput{Entries: entries}
