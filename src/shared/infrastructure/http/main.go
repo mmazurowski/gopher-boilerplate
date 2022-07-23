@@ -7,9 +7,15 @@ import (
 	"github.com/aws/aws-lambda-go/events"
 )
 
+const internalServerError int = 500
+const notFound int = 404
+const created int = 201
+const success int = 200
+const validationError int = 422
+
 func RespondWith(content map[string]string, httpStatus int) events.APIGatewayProxyResponse {
 	errorResponse := events.APIGatewayProxyResponse{
-		StatusCode: 500,
+		StatusCode: internalServerError,
 		Headers: map[string]string{
 			"Content-Type": "application/json",
 		},
@@ -37,15 +43,15 @@ func RespondWith(content map[string]string, httpStatus int) events.APIGatewayPro
 }
 
 func Success(content map[string]string) (events.APIGatewayProxyResponse, error) {
-	return RespondWith(content, 200), nil
+	return RespondWith(content, success), nil
 }
 
 func NotFound(content map[string]string) (events.APIGatewayProxyResponse, error) {
-	return RespondWith(content, 404), nil
+	return RespondWith(content, notFound), nil
 }
 
 func Created(content map[string]string) (events.APIGatewayProxyResponse, error) {
-	return RespondWith(content, 201), nil
+	return RespondWith(content, created), nil
 }
 
 func ValidationError(err error) (events.APIGatewayProxyResponse, error) {
@@ -53,7 +59,7 @@ func ValidationError(err error) (events.APIGatewayProxyResponse, error) {
 		"type":    "ValidationError",
 		"status":  "422",
 		"details": err.Error(),
-	}, 422), nil
+	}, validationError), nil
 }
 
 func InternalServerError(err error) (events.APIGatewayProxyResponse, error) {
@@ -61,5 +67,5 @@ func InternalServerError(err error) (events.APIGatewayProxyResponse, error) {
 		"type":    "InternalServerError",
 		"status":  "500",
 		"details": err.Error(),
-	}, 500), nil
+	}, internalServerError), nil
 }
