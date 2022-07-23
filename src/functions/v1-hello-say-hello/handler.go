@@ -16,7 +16,11 @@ type dependencies struct {
 	eventBus *eventbus.EventBus
 }
 
-func handler(ctx context.Context, gatewayEvent events.APIGatewayProxyRequest, deps dependencies) (events.APIGatewayProxyResponse, error) {
+func handler(
+	ctx context.Context,
+	gatewayEvent events.APIGatewayProxyRequest,
+	deps dependencies) (
+	events.APIGatewayProxyResponse, error) {
 	deps.logger.Info("Hello there! " + deps.config.appName)
 
 	greetEvent, err := parseGatewayEvent(gatewayEvent)
