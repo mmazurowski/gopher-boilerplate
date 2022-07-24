@@ -1,6 +1,10 @@
 name: development
 on: pull_request
 
+env:
+  tf_version: 'latest'
+  tg_version: 'latest'
+
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: true
@@ -59,24 +63,18 @@ jobs:
       - name: Init Terragrunt
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_version: "latest"
-          tg_actions_version: "latest"
-          tf_actions_subcommand: 'run-all init'
-          tf_actions_working_dir: "infrastructure"
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: "infrastructure/dev"
           tf_actions_comment: false
-      - name: Validate infrastructure
+      - name: Validate DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_version: "latest"
-          tg_actions_version: "latest"
-          tf_actions_subcommand: 'run-all validate'
-          tf_actions_working_dir: "infrastructure"
+          tf_actions_subcommand: 'validate'
+          tf_actions_working_dir: "infrastructure/dev"
           tf_actions_comment: false
-      - name: Plan infrastructure
+      - name: Plan DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_version: "latest"
-          tg_actions_version: "latest"
           tf_actions_subcommand: 'plan'
           tf_actions_working_dir: "infrastructure/dev"
           tf_actions_comment: false
