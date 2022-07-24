@@ -4,7 +4,7 @@ on: pull_request
 env:
   tf_version: 'latest'
   tg_version: 'latest'
-  INFRASTRUCTURE_DIRECTORY: "infrastructure/dev"
+  INFRASTRUCTURE_DIRECTORY: "./infrastructure/dev"
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
@@ -84,6 +84,7 @@ jobs:
     needs:
       - terraform-quality
     steps:
+      - uses: actions/checkout@v3
       - name: Apply DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
