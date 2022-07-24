@@ -4,6 +4,7 @@ on: pull_request
 env:
   tf_version: 'latest'
   tg_version: 'latest'
+  INFRASTRUCTURE_DIRECTORY: "infrastructure/dev"
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
@@ -64,23 +65,23 @@ jobs:
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_subcommand: 'init'
-          tf_actions_working_dir: "infrastructure/dev"
+          tf_actions_working_dir: $INFRASTRUCTURE_DIRECTORY
           tf_actions_comment: false
       - name: Validate DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
           tf_actions_subcommand: 'validate'
-          tf_actions_working_dir: "infrastructure/dev"
+          tf_actions_working_dir: $INFRASTRUCTURE_DIRECTORY
           tf_actions_comment: false
       - name: Run TFSec
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
-          working_directory: "infrastructure/dev"
-      - name: Plan DEV infrastructure
+          working_directory: $INFRASTRUCTURE_DIRECTORY
+      - name: Apply DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
-          tf_actions_subcommand: 'plan'
-          tf_actions_working_dir: "infrastructure/dev"
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: $INFRASTRUCTURE_DIRECTORY
           tf_actions_comment: false
   deploy:
     needs:
