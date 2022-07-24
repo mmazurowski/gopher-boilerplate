@@ -57,7 +57,7 @@ jobs:
       - name: Runt tests
         run: task tests:all
   terraform-quality:
-    name: Terraform Quality
+    name: Infrastructure quality
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v3
@@ -76,10 +76,10 @@ jobs:
       - name: Run TFSec
         uses: aquasecurity/tfsec-action@v1.0.0
         with:
-          working_directory: $INFRASTRUCTURE_DIRECTORY
+          working_directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
 
   terraform-deploy:
-    name: Terraform Deploy
+    name: Infrastructure deployment
     runs-on: ubuntu-18.04
     needs:
       - terraform-quality
