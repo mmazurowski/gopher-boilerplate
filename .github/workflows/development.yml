@@ -118,4 +118,4 @@ jobs:
           node-version: 16
       - run: npm install
       - name: Serverless deploy
-        run: ls && ./node_modules/bin/sls deploy
+        run: ./node_modules/.bin/sls deploy
