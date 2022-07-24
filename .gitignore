@@ -33,3 +33,7 @@ bin
 # HTTP client envs
 !http-client.example.env.json
 http-client.*.env.json
+
+# terraform
+infrastructure/backend.tf
+.terraform
