@@ -113,5 +113,9 @@ jobs:
         with:
           name: build-dev
           path: bin
-      - name: Deploy to AWS
-        run: echo "Deployed!" && ls bin
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+      - name: Serverless deploy
+        run: sls deploy
