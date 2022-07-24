@@ -112,5 +112,6 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: build-dev
+          path: bin
       - name: Deploy to AWS
-        run: echo "Deployed!" && ls
+        run: echo "Deployed!" && ls bin
