@@ -1,6 +1,12 @@
 name: development
 on: pull_request
 
+env:
+  tf_version: 'latest'
+  tg_version: 'latest'
+  INFRASTRUCTURE_DIRECTORY: "./infrastructure/dev"
+  AWS_REGION_DEV: "eu-west-1"
+
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
   cancel-in-progress: true
@@ -24,9 +30,9 @@ jobs:
           go-version: 1.18.x
       - uses: dominikh/staticcheck-action@v1.2.0
         with:
-            version: "2022.1"
-            build-tags: "-s -w"
-            install-go: false
+          version: "2022.1"
+          build-tags: "-s -w"
+          install-go: false
   build:
     name: Build
     runs-on: ubuntu-18.04
@@ -39,6 +45,12 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Build
         run: task project:build
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-dev
+          path: bin
+          retention-days: 5
   unit:
     name: Unit Tests
     runs-on: ubuntu-18.04
@@ -51,18 +63,76 @@ jobs:
         uses: arduino/setup-task@v1
       - name: Runt tests
         run: task tests:all
+  terraform-quality:
+    name: Infrastructure quality
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+      - name: Init Terragrunt
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_subcommand: 'init'
+          tf_actions_working_dir: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+          tf_actions_comment: false
+      - name: Validate DEV infrastructure
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_subcommand: 'validate'
+          tf_actions_working_dir: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+          tf_actions_comment: false
+      - name: Run TFSec
+        uses: aquasecurity/tfsec-action@v1.0.0
+        with:
+          working_directory: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+
+  terraform-deploy:
+    name: Infrastructure deployment
+    runs-on: ubuntu-18.04
+    needs:
+      - terraform-quality
+      - build
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Apply DEV infrastructure
+        uses: the-commons-project/terragrunt-github-actions@master
+        with:
+          tf_actions_subcommand: 'apply'
+          tf_actions_working_dir: ${{ env.INFRASTRUCTURE_DIRECTORY }}
+          tf_actions_comment: false
   deploy:
     needs:
       - unit
       - staticcheck
       - build
       - lint
+      - terraform-deploy
     name: Deploy to AWS
     runs-on: ubuntu-18.04
+    env:
+      SERVICE_NAME: service-name
     steps:
       - uses: actions/checkout@v3
-      - uses: WillAbides/setup-go-faster@v1.7.0
+      - name: Fetch build artifacts
+        uses: actions/download-artifact@v3
         with:
-          go-version: 1.18.x
-      - name: Deploy to AWS
-        run: echo "Deployed!"
+          name: build-dev
+          path: bin
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - run: npm install
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN_DEV }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION_DEV }}
+      - name: Serverless deploy
+        run: ./node_modules/.bin/sls deploy
