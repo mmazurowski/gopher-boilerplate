@@ -5,6 +5,7 @@ env:
   tf_version: 'latest'
   tg_version: 'latest'
   INFRASTRUCTURE_DIRECTORY: "./infrastructure/dev"
+  AWS_REGION_DEV: "eu-west-1"
 
 concurrency:
   group: '${{ github.workflow }} @ ${{ github.event.pull_request.head.label || github.head_ref || github.ref }}'
@@ -29,9 +30,9 @@ jobs:
           go-version: 1.18.x
       - uses: dominikh/staticcheck-action@v1.2.0
         with:
-            version: "2022.1"
-            build-tags: "-s -w"
-            install-go: false
+          version: "2022.1"
+          build-tags: "-s -w"
+          install-go: false
   build:
     name: Build
     runs-on: ubuntu-18.04
@@ -89,8 +90,15 @@ jobs:
     runs-on: ubuntu-18.04
     needs:
       - terraform-quality
+      - build
     steps:
       - uses: actions/checkout@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION_DEV }}
       - name: Apply DEV infrastructure
         uses: the-commons-project/terragrunt-github-actions@master
         with:
@@ -106,6 +114,8 @@ jobs:
       - terraform-deploy
     name: Deploy to AWS
     runs-on: ubuntu-18.04
+    env:
+      SERVICE_NAME: service-name
     steps:
       - uses: actions/checkout@v3
       - name: Fetch build artifacts
@@ -117,5 +127,12 @@ jobs:
         with:
           node-version: 16
       - run: npm install
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{ secrets.AWS_ASSUME_ROLE_ARN_DEV }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_DEV }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_DEV }}
+          aws-region: ${{ env.AWS_REGION_DEV }}
       - name: Serverless deploy
         run: ./node_modules/.bin/sls deploy
